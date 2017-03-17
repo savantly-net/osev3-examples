@@ -7,18 +7,25 @@ MAINTAINER Jorge Morales <jmorales@redhat.com>
 ENV GRADLE_VERSION 2.6
 ENV MAVEN_VERSION 3.3.9
 
+RUN echo "Installing os packages"
 RUN yum install -y --enablerepo=centosplus \
     tar unzip bc which lsof java-1.8.0-openjdk java-1.8.0-openjdk-devel && \
-    yum clean all -y && \
-    (curl -0 http://www.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz | \
+    yum clean all -y
+
+RUN echo "Installing Maven"
+RUN (curl -0 http://www.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz | \
     tar -zx -C /usr/local) && \
     mv /usr/local/apache-maven-$MAVEN_VERSION /usr/local/maven && \
-    ln -sf /usr/local/maven/bin/mvn /usr/local/bin/mvn && \
-    curl -sL -0 https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -o /tmp/gradle-${GRADLE_VERSION}-bin.zip && \
+    ln -sf /usr/local/maven/bin/mvn /usr/local/bin/mvn
+    
+RUN "Installing Gradle"
+RUN curl -sL -0 https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -o /tmp/gradle-${GRADLE_VERSION}-bin.zip && \
     unzip /tmp/gradle-${GRADLE_VERSION}-bin.zip -d /usr/local/ && \
     rm /tmp/gradle-${GRADLE_VERSION}-bin.zip && \
     mv /usr/local/gradle-${GRADLE_VERSION} /usr/local/gradle && \
-    ln -sf /usr/local/gradle/bin/gradle /usr/local/bin/gradle && \
+    ln -sf /usr/local/gradle/bin/gradle /usr/local/bin/gradle
+    
+RUN echo "Creating directories"
     mkdir -p /opt/openshift && \
     mkdir -p /opt/app-root/source && chmod -R a+rwX /opt/app-root/source && \
     mkdir -p /opt/s2i/destination && chmod -R a+rwX /opt/s2i/destination && \
